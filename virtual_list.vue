@@ -44,7 +44,7 @@
             }
         }) option!: object;
 
-        @Watch('list')
+        @Watch('list', {deep: true, immediate: true})
         watchList () {
             this.updateView();
         }
@@ -70,7 +70,8 @@
         handleScroll () {
             let currentTime = +new Date();
             if (currentTime - this.lastTime > this.timeout) {
-                this.updateVisibleData(this.$refs.scroller.scrollTop);
+                let scrollTop = this.$refs.scroller && this.$refs.scroller.scrollTop;
+                this.updateVisibleData(scrollTop);
                 this.lastTime = currentTime;
             }
         }
@@ -90,7 +91,12 @@
         }
 
         getContentHeight () {
-            let visibleListLen = (this.list || []).filter(item => item.visible);
+            let visibleListLen = 0;
+            if (this.filterFn) {
+                visibleListLen = this.filterFn(this.list || []).length;
+            } else {
+                visibleListLen = (this.list || []).length;
+            }
             this.contentHeight = visibleListLen * this.option.itemHeight;
         }
     }
@@ -133,4 +139,3 @@
         }
 
     }
-</style>
